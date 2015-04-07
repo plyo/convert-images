@@ -46,11 +46,23 @@ fs.exists(outputDir, (exists) => {
   }
 });
 
-// resize and remove EXIF profile data
+let optimizedOut = outputDir + 'optimized.jpg';
+
+/*
+ * Optimize original image
+ */
 gm(fileName)
-.resize(240, 240)
-.noProfile()
-.write('./output/resize.png', function (err) {
-  if(err) error(err);
-  if (!err) notice('done');
-});
+  // remove EXIF profile data
+  .noProfile()
+  // Optimize with quality setting of 70 (out of 100)
+  // Slight blur for size purposes (`gaussian(radius [,sigma])`)
+  .quality(85)
+  .gaussian(0.05)
+  // Sharpen it (`unsharp(radius [, sigma, amount, threshold])`)
+  .unsharp(1, 0.5, 0.7, 0)
+  // Interlace image (make it progressive) using "Plane" scheme
+  .interlace('Line')
+  .write(optimizedOut, function (err) {
+    if(err) error(err);
+    if (!err) notice('done');
+  });
