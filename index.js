@@ -5,17 +5,52 @@
  */
 
 import program from 'commander';
+import clc from 'cli-color';
+
+function error(...args) {
+  console.error(clc.red.bold(args));
+}
+function warn(...args) {
+  console.warn(clc.yellow(args));
+}
+function notice(...args) {
+  console.log(clc.blue(args));
+}
 
 program
   .version('0.0.1')
-  .option('-p, --peppers', 'Add peppers')
-  .option('-P, --pineapple', 'Add pineapple')
-  .option('-b, --bbq', 'Add bbq sauce')
-  .option('-c, --cheese [type]', 'Add the specified type of cheese [marble]', 'marble')
+  .description('Takes an image as input and applies optimizations, outputting the results to \'./output/\'')
+  .usage('[options] <imagefile ...>')
   .parse(process.argv);
 
-console.log('you ordered a pizza with:');
-if (program.peppers) console.log('  - peppers');
-if (program.pineapple) console.log('  - pineapple');
-if (program.bbq) console.log('  - bbq');
-console.log('  - %s cheese', program.cheese);
+if (program.args.length !== 1) {
+  error('A single filename must be given!');
+  program.help();
+}
+var fileName =  program.args[0];
+
+notice('Processing file:', fileName);
+
+import gm from 'gm';
+import fs from 'fs';
+
+let outputDir = './output/';
+fs.exists(outputDir, (exists) => {
+  if (exists) {
+    fs.exists(outputDir+'/*', (exists) => {
+      error('Please clear \'./output\' dir');
+      process.exit(0);
+    });
+  } else {
+    fs.mkdirSync(outputDir);
+  }
+});
+
+// resize and remove EXIF profile data
+gm(fileName)
+.resize(240, 240)
+.noProfile()
+.write('./output/resize.png', function (err) {
+  if(err) error(err);
+  if (!err) notice('done');
+});
