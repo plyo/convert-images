@@ -1,6 +1,12 @@
 # qConcept image processor
 
+This is a script based on [GraphicsMagick](http://www.graphicsmagick.org/) to optimize and resize images for use on the qConcept platform
+
+
 ### How to Install
+[GraphicsMagick](http://www.graphicsmagick.org/README.html) is a prerequisite, so install it first.
+
+Then:
 
 ```shell
 $ npm install Qlimt/convert-images
