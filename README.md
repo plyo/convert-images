@@ -9,3 +9,5 @@ Options:
 
   -h, --help     output usage information
   -V, --version  output the version number
+
+**NOTE:** The `.output/` directory must be empty!

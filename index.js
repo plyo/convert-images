@@ -46,23 +46,64 @@ fs.exists(outputDir, (exists) => {
   }
 });
 
-let optimizedOut = outputDir + 'optimized.jpg';
+let optimizedOut = outputDir + 'bgImage.jpg';
+let largeOut = outputDir + 'bgImage-1920x1080.jpg';
+let mediumOut = outputDir + 'bgImage-1366x768.jpg';
+let smallOut = outputDir + 'bgImage-360x640.jpg';
 
-/*
- * Optimize original image
- */
-gm(fileName)
-  // remove EXIF profile data
-  .noProfile()
-  // Optimize with quality setting of 70 (out of 100)
-  // Slight blur for size purposes (`gaussian(radius [,sigma])`)
-  .quality(85)
-  .gaussian(0.05)
-  // Sharpen it (`unsharp(radius [, sigma, amount, threshold])`)
-  .unsharp(1, 0.5, 0.7, 0)
-  // Interlace image (make it progressive) using "Plane" scheme
-  .interlace('Line')
-  .write(optimizedOut, function (err) {
-    if(err) error(err);
-    if (!err) notice('done');
-  });
+
+new Promise((resolve, reject) => {
+  /*
+   * Optimize original image
+   */
+  gm(fileName)
+    // remove EXIF profile data
+    .noProfile()
+    // Optimize with quality setting of 70 (out of 100)
+    // Slight blur for size purposes (`gaussian(radius [,sigma])`)
+    .quality(85)
+    //.gaussian(0.05) // Ignoring this for now. Reduces size quite a bit but makes detailed images too blurry
+    // Sharpen it (`unsharp(radius [, sigma, amount, threshold])`)
+    .unsharp(1, 0.5, 0.7, 0)
+    // Interlace image (make it progressive) using "Plane" scheme
+    .interlace('Line')
+    .write(optimizedOut, function (err) {
+      if(err) {
+        reject(err);
+      }
+      if (!err) {
+        notice('done optimizing');
+        resolve(optimizedOut);
+      }
+    });
+}).then(file => {
+  // Resize large image
+  gm(file)
+    .resize(null, 1080)
+    .crop(1920, 1080, 0, 0)
+    .write(largeOut, function (err) {
+      if (err) error(err);
+      if (!err) notice('large done');
+    });
+
+  // Resize medium image
+  gm(file)
+    .resize(null, 768)
+    .crop(1366, 768, 0, 0)
+    .write(mediumOut, function (err) {
+      if (err) error(err);
+      if (!err) notice('medium done');
+    });
+
+  // Resize small image
+  gm(file)
+    .resize(null, 640)
+    .crop(360, 640, 503, 0) //503 X offset should make sure we crop out middle of image
+    .write(smallOut, function (err) {
+      if (err) error(err);
+      if (!err) notice('small done');
+    });
+
+}).catch(err => {
+  error(err);
+});

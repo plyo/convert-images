@@ -1,5 +1,5 @@
 {
-  "name": "cli-tools",
+  "name": "convert-images",
   "version": "1.0.0",
   "description": "CLI tools for qConcept development",
   "main": "index.js",
