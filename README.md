@@ -1,5 +1,13 @@
 # qConcept image processor
 
+### How to Install
+
+```shell
+$ npm install Qlimt/convert-images
+```
+
+### How to Use
+
 Usage: `npm start -- [options] <imagefile ...>`  
 Or if you bave `babel` globally installed: `babel-node index.js [options] <imagefile ...>`
 
