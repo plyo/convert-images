@@ -27,7 +27,7 @@ if (program.args.length !== 1) {
   error('A single filename must be given!');
   program.help();
 }
-var fileName =  program.args[0];
+let fileName =  program.args[0];
 
 notice('Processing file:', fileName);
 
@@ -59,14 +59,15 @@ new Promise((resolve, reject) => {
   gm(fileName)
     // remove EXIF profile data
     .noProfile()
-    // Optimize with quality setting of 70 (out of 100)
-    // Slight blur for size purposes (`gaussian(radius [,sigma])`)
+    // Optimize with quality setting of 85 (out of 100)
     .quality(85)
-    //.gaussian(0.05) // Ignoring this for now. Reduces size quite a bit but makes detailed images too blurry
+    // Slight blur for size purposes (`gaussian(radius [,sigma])`)
+    // Ignoring this for now. Reduces size quite a bit but makes detailed images too blurry
+    //.gaussian(0.05)
     // Sharpen it (`unsharp(radius [, sigma, amount, threshold])`)
     .unsharp(1, 0.5, 0.7, 0)
     // Interlace image (make it progressive) using "Plane" scheme
-    .interlace('Line')
+    .interlace('Plane')
     .write(optimizedOut, function (err) {
       if(err) {
         reject(err);
